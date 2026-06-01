@@ -17,20 +17,8 @@ const SUPABASE_URL = "https://obrlhfpfiahedkvxtntl.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9icmxoZnBmaWFoZWRrdnh0bnRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTAyMTYsImV4cCI6MjA5NTY2NjIxNn0.RqghH_xfvWPpHRWtrqiT2ObF_OH13SFOgWUDlftPg7E";
 const SB = { "Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`,"Prefer":"return=representation" };
 async function sbGet(table,params=""){const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{headers:SB});if(!res.ok)throw new Error(await res.text());return res.json();}
-async function sbUpsert(table,data,token){
-  const headers={...SB,"Prefer":"resolution=merge-duplicates,return=representation"};
-  if(token) headers["Authorization"]=`Bearer ${token}`;
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:"POST",headers,body:JSON.stringify(data)});
-  if(!res.ok)throw new Error(await res.text());
-  return res.json();
-}
-async function sbDelete(table,match,token){
-  const params=Object.entries(match).map(([k,v])=>`${k}=eq.${v}`).join("&");
-  const headers={...SB};
-  if(token) headers["Authorization"]=`Bearer ${token}`;
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{method:"DELETE",headers});
-  if(!res.ok)throw new Error(await res.text());
-}
+async function sbUpsert(table,data){const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:"POST",headers:{...SB,"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify(data)});if(!res.ok)throw new Error(await res.text());return res.json();}
+async function sbDelete(table,match){const params=Object.entries(match).map(([k,v])=>`${k}=eq.${v}`).join("&");const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{method:"DELETE",headers:SB});if(!res.ok)throw new Error(await res.text());}
 
 // ─── Teams ────────────────────────────────────────────────────────────────────
 const TEAMS = {
@@ -44,24 +32,8 @@ const TEAMS = {
   ],
 };
 const ALL_TEAMS=[...TEAMS.baseball,...TEAMS.softball];
-// ─── Supabase Auth ────────────────────────────────────────────────────────────
-async function sbSignIn(email, password) {
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
-    body: JSON.stringify({ email, password }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error_description || data.msg || "Login failed");
-  return data.access_token;
-}
-
-async function sbSignOut(token) {
-  await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY, "Authorization": `Bearer ${token}` },
-  });
-}
+// Admin password stored here — keep repo private
+const ADMIN_PASSWORD="allstars2026";
 
 // ─── Pre-populated bracket data from PDFs ─────────────────────────────────────
 // Location shorthand
@@ -567,8 +539,7 @@ export default function App(){
   const[saveMsg,setSaveMsg]=useState("");
   const[dbError,setDbError]=useState("");
   const[password,setPassword]=useState("");
-  const[email,setEmail]=useState("");
-  const[authToken,setAuthToken]=useState(null);
+
   const[authError,setAuthError]=useState(false);
 
   const[resultForm,setResultForm]=useState({teamId:ALL_TEAMS[0].id,opponent:"",teamScore:"",oppScore:"",date:new Date().toISOString().slice(0,10),result:"W",round:""});
@@ -627,23 +598,12 @@ export default function App(){
 
   function flash(msg){setSaveMsg(msg);setTimeout(()=>setSaveMsg(""),2500);}
 
-  async function handleLogin(){
-    try {
-      const token = await sbSignIn(email, password);
-      setAuthToken(token);
-      setIsAdmin(true);
-      setView("admin");
-      setAuthError(false);
-      setPassword("");
-      setEmail("");
-    } catch(e) {
-      setAuthError(true);
-    }
+  function handleLogin(){
+    if(password===ADMIN_PASSWORD){setIsAdmin(true);setView("admin");setAuthError(false);setPassword("");}
+    else setAuthError(true);
   }
 
-  async function handleLogout(){
-    if(authToken) await sbSignOut(authToken).catch(()=>{});
-    setAuthToken(null);
+  function handleLogout(){
     setIsAdmin(false);
     setView("baseball");
   }
@@ -651,8 +611,8 @@ export default function App(){
   async function toggleEliminated(teamId){
     const isElim=!!eliminated[teamId];
     try{
-      if(isElim){await sbDelete("eliminated",{team_id:teamId},authToken);setEliminated(prev=>{const n={...prev};delete n[teamId];return n;});}
-      else{await sbUpsert("eliminated",[{team_id:teamId}],authToken);setEliminated(prev=>({...prev,[teamId]:true}));}
+      if(isElim){await sbDelete("eliminated",{team_id:teamId});setEliminated(prev=>{const n={...prev};delete n[teamId];return n;});}
+      else{await sbUpsert("eliminated",[{team_id:teamId}]);setEliminated(prev=>({...prev,[teamId]:true}));}
     }catch(e){flash("Error updating");}
   }
 
@@ -662,9 +622,9 @@ export default function App(){
     setSaving(true);
     try{
       const id=Date.now();
-      await sbUpsert("games",[{id,team_id:teamId,opponent,team_score:parseInt(teamScore),opp_score:parseInt(oppScore),date,result,round:round||null}],authToken);
+      await sbUpsert("games",[{id,team_id:teamId,opponent,team_score:parseInt(teamScore),opp_score:parseInt(oppScore),date,result,round:round||null}]);
       const nr={...records[teamId]};if(result==="W")nr.w+=1;else nr.l+=1;
-      await sbUpsert("records",[{team_id:teamId,w:nr.w,l:nr.l}],authToken);
+      await sbUpsert("records",[{team_id:teamId,w:nr.w,l:nr.l}]);
       setRecords(prev=>({...prev,[teamId]:nr}));
       setGames(prev=>[{id,teamId,opponent,teamScore:parseInt(teamScore),oppScore:parseInt(oppScore),date,result,round},...prev]);
       setResultForm(f=>({...f,opponent:"",teamScore:"",oppScore:"",round:""}));
@@ -675,9 +635,9 @@ export default function App(){
 
   async function handleDeleteResult(game){
     try{
-      await sbDelete("games",{id:game.id},authToken);
+      await sbDelete("games",{id:game.id});
       const rec={...records[game.teamId]};if(game.result==="W")rec.w=Math.max(0,rec.w-1);else rec.l=Math.max(0,rec.l-1);
-      await sbUpsert("records",[{team_id:game.teamId,w:rec.w,l:rec.l}],authToken);
+      await sbUpsert("records",[{team_id:game.teamId,w:rec.w,l:rec.l}]);
       setRecords(prev=>({...prev,[game.teamId]:rec}));setGames(prev=>prev.filter(g=>g.id!==game.id));
     }catch(e){flash("Error deleting");}
   }
@@ -688,7 +648,7 @@ export default function App(){
     setSaving(true);
     try{
       const id=Date.now();
-      await sbUpsert("schedule",[{id,team_id:teamId,opponent,date,time:time||null,location:location||null}],authToken);
+      await sbUpsert("schedule",[{id,team_id:teamId,opponent,date,time:time||null,location:location||null}]);
       const entry={id,teamId,opponent,date,time,location};
       setSchedule(prev=>({...prev,[teamId]:[...(prev[teamId]||[]),entry].sort((a,b)=>a.date.localeCompare(b.date))}));
       setSchedForm(f=>({...f,opponent:"",time:"",location:""}));
@@ -698,7 +658,7 @@ export default function App(){
   }
 
   async function handleDeleteScheduled(teamId,gameId){
-    try{await sbDelete("schedule",{id:gameId},authToken);setSchedule(prev=>({...prev,[teamId]:(prev[teamId]||[]).filter(g=>g.id!==gameId)}));}
+    try{await sbDelete("schedule",{id:gameId});setSchedule(prev=>({...prev,[teamId]:(prev[teamId]||[]).filter(g=>g.id!==gameId)}));}
     catch(e){flash("Error");}
   }
 
@@ -721,7 +681,7 @@ export default function App(){
   }
 
   async function handleDeleteBracket(id){
-    try{await sbDelete("brackets",{id},authToken);setBrackets(prev=>prev.filter(b=>b.id!==id));setActiveBracket(0);setEditingBracket(null);}
+    try{await sbDelete("brackets",{id});setBrackets(prev=>prev.filter(b=>b.id!==id));setActiveBracket(0);setEditingBracket(null);}
     catch(e){flash("Error deleting");}
   }
 
@@ -795,8 +755,6 @@ export default function App(){
                   <div style={{color:C.textMuted,fontSize:21,marginTop:3}}>Manage results, schedules & brackets</div>
                 </div>
                 <div style={{padding:24}}>
-                  <Label>Email</Label>
-                  <input type="email" placeholder="sdllboard@gmail.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()} style={{...inputStyle,marginBottom:12}}/>
                   <Label>Password</Label>
                   <input type="password" placeholder="Enter password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()} style={{...inputStyle,borderColor:authError?C.orange:"rgba(255,255,255,0.1)",marginBottom:authError?6:16}}/>
                   {authError&&<div style={{color:C.orange,fontSize:21,marginBottom:14,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>Incorrect password.</div>}
