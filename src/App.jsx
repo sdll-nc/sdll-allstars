@@ -350,7 +350,7 @@ const C={
 const defaultRecords=()=>{const r={};ALL_TEAMS.forEach(t=>{r[t.id]={w:0,l:0};});return r;};
 function pct(w,l){const t=w+l;if(!t)return"—";const p=w/t;return p===1?"1.000":p.toFixed(3).replace(/^0/,"");}
 function formatDate(d){if(!d)return"";const[,m,day]=d.split("-");return`${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][parseInt(m)-1]} ${parseInt(day)}`;}
-function formatDateTime(d,t){const ds=formatDate(d);if(!t)return ds;const[h,min]=t.split(":");const hour=parseInt(h);return`${ds} · ${hour%12||12}:${min} ${hour>=12?"PM":"AM"}`;}
+function formatDateTime(d,t){const ds=formatDate(d);if(!t||t==="TBD"||!t.includes(":"))return t&&t!=="TBD"?`${ds} · ${t}`:ds;const[h,min]=t.split(":");const hour=parseInt(h);if(isNaN(hour))return ds;return`${ds} · ${hour%12||12}:${min} ${hour>=12?"PM":"AM"}`;}
 
 // ─── Small UI ─────────────────────────────────────────────────────────────────
 function ColHead({children,style={}}){return<span style={{fontSize:19,fontWeight:700,letterSpacing:2,color:C.textMuted,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif",...style}}>{children}</span>;}
@@ -398,17 +398,76 @@ function BracketGameDisplay({game,roundIndex,gameIndex,onUpdate,isAdmin}){
 
 function BracketView({bracket,onUpdateGame,isAdmin}){
   if(!bracket||!bracket.rounds)return null;
+
+  const isLoserRound = r =>
+    r.bracket==="L" ||
+    r.name.toLowerCase().includes("loser") ||
+    r.name.toLowerCase().includes("elim");
+  const isChampRound = r =>
+    r.bracket==="C" ||
+    r.name.toLowerCase().includes("championship");
+
+  const winnersRounds = bracket.rounds.filter(r => !isLoserRound(r));
+  const losersRounds  = bracket.rounds.filter(r =>  isLoserRound(r));
+  const hasSplit = losersRounds.length > 0;
+
+  const RoundCol = ({round}) => {
+    const globalRi = bracket.rounds.indexOf(round);
+    return (
+      <div style={{flex:1,minWidth:180}}>
+        <div style={{
+          background: isChampRound(round) ? C.orange : C.green,
+          color:"#fff", padding:"8px 10px", fontSize:12, fontWeight:700,
+          letterSpacing:1.5, textTransform:"uppercase", textAlign:"center",
+          margin:"0 4px 12px", borderRadius:4,
+          fontFamily:"'Barlow Condensed', sans-serif",
+          whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis",
+        }}>{round.name}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:10,padding:"0 4px"}}>
+          {round.games.map((game,gi)=>(
+            <BracketGameDisplay key={gi} game={game} gameIndex={gi} roundIndex={globalRi}
+              isAdmin={isAdmin} onUpdate={isAdmin&&onUpdateGame?onUpdateGame:null}/>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  if(!hasSplit){
+    return(
+      <div style={{overflowX:"auto",paddingBottom:16}}>
+        <div style={{display:"flex",gap:0,minWidth:bracket.rounds.length*190}}>
+          {bracket.rounds.map((round,ri)=><RoundCol key={ri} round={round}/>)}
+        </div>
+      </div>
+    );
+  }
+
   return(
-    <div style={{overflowX:"auto",paddingBottom:16}}>
-      <div style={{display:"flex",gap:0,minWidth:bracket.rounds.length*200}}>
-        {bracket.rounds.map((round,ri)=>(
-          <div key={ri} style={{flex:1,minWidth:190}}>
-            <div style={{background:ri===bracket.rounds.length-1?C.orange:C.green,color:"#fff",padding:"8px 12px",fontSize:23,fontWeight:700,letterSpacing:2,textTransform:"uppercase",textAlign:"center",margin:"0 4px 12px",borderRadius:4,fontFamily:"'Barlow Condensed', sans-serif"}}>{round.name}</div>
-            <div style={{display:"flex",flexDirection:"column",gap:10,padding:"0 4px"}}>
-              {round.games.map((game,gi)=><BracketGameDisplay key={gi} game={game} gameIndex={gi} roundIndex={ri} isAdmin={isAdmin} onUpdate={isAdmin&&onUpdateGame?onUpdateGame:null}/>)}
-            </div>
+    <div style={{paddingBottom:16}}>
+      {/* Winners on top */}
+      <div style={{marginBottom:20}}>
+        <div style={{fontSize:12,fontWeight:700,letterSpacing:3,color:C.greenText,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif",marginBottom:8,paddingLeft:4}}>▲ Winners Bracket</div>
+        <div style={{overflowX:"auto"}}>
+          <div style={{display:"flex",gap:0,minWidth:winnersRounds.length*190}}>
+            {winnersRounds.map((round,ri)=><RoundCol key={ri} round={round}/>)}
           </div>
-        ))}
+        </div>
+      </div>
+      {/* Divider */}
+      <div style={{display:"flex",alignItems:"center",gap:12,margin:"8px 0 20px",opacity:0.4}}>
+        <div style={{flex:1,height:1,background:C.border}}/>
+        <span style={{fontSize:10,letterSpacing:2,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,textTransform:"uppercase",flexShrink:0}}>Losers Bracket</span>
+        <div style={{flex:1,height:1,background:C.border}}/>
+      </div>
+      {/* Losers on bottom */}
+      <div>
+        <div style={{fontSize:12,fontWeight:700,letterSpacing:3,color:C.orangeText,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif",marginBottom:8,paddingLeft:4}}>▼ Losers Bracket</div>
+        <div style={{overflowX:"auto"}}>
+          <div style={{display:"flex",gap:0,minWidth:losersRounds.length*190}}>
+            {losersRounds.map((round,ri)=><RoundCol key={ri} round={round}/>)}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -641,7 +700,7 @@ export default function App(){
               </div>
             </div>
             <div style={{display:"flex",alignItems:"flex-end",gap:20,marginBottom:24}}>
-              <div style={{width:68,height:68,borderRadius:"50%",background:"linear-gradient(145deg,#2D6A2D,#1a3d1a)",border:`3px solid ${C.orange}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 20px rgba(232,93,4,0.35),inset 0 1px 0 rgba(255,255,255,0.1)",lineHeight:1}}>
+              <div style={{width:84,height:84,borderRadius:"50%",background:"linear-gradient(145deg,#2D6A2D,#1a3d1a)",border:`3px solid ${C.orange}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 20px rgba(232,93,4,0.35),inset 0 1px 0 rgba(255,255,255,0.1)",lineHeight:1}}>
                 <span style={{fontSize:23,fontWeight:700,color:C.orange,letterSpacing:1,fontFamily:"'Barlow Condensed', sans-serif"}}>SDLL</span>
                 <span style={{fontSize:25,marginTop:1}}>⚾</span>
               </div>
@@ -726,7 +785,7 @@ export default function App(){
                           <div style={{fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:23,letterSpacing:1,color:isExpanded?C.textPrimary:C.textSecondary,textDecoration:isElim?"line-through":"none",textDecorationColor:"rgba(255,255,255,0.3)"}}>
                             {team.name}{isElim&&<span style={{marginLeft:8,fontSize:19,letterSpacing:2,color:C.textMuted,fontWeight:600,textDecoration:"none",verticalAlign:"middle"}}>ELIMINATED</span>}
                           </div>
-                          {(teamGames.length>0||upcoming.length>0)&&<div style={{fontSize:23,color:C.textMuted,marginTop:1}}>{teamGames.length>0?`${teamGames.length} result${teamGames.length!==1?"s":""}`:""}{upcoming.length>0?` · ${upcoming.length} upcoming`:""}</div>}
+                          {(teamGames.length>0||upcoming.length>0)&&<div style={{fontSize:23,color:C.textMuted,marginTop:1}}>{[teamGames.length>0?`${teamGames.length} result${teamGames.length!==1?"s":""}`:null, upcoming.length>0?`${upcoming.length} upcoming`:null].filter(Boolean).join(" · ")}</div>}
                         </div>
                         <div style={{width:52,textAlign:"center"}}><StatBadge value={rec.w} type="w"/></div>
                         <div style={{width:52,textAlign:"center"}}><StatBadge value={rec.l} type="l"/></div>
@@ -807,7 +866,6 @@ export default function App(){
                       <div style={{color:C.textPrimary,fontWeight:700,fontSize:21,fontFamily:"'Bebas Neue', sans-serif",letterSpacing:2}}>🏆 {brackets[activeBracket].title}</div>
                       <div style={{color:C.textMuted,fontSize:23,marginTop:2,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>
                         {brackets[activeBracket].type==="double-elim"?"Double Elimination":brackets[activeBracket].type==="single-elim"?"Single Elimination":brackets[activeBracket].type==="pool-play"?"Pool Play":"Custom Format"}
-                        {" · "}{brackets[activeBracket].teamNames?.join(", ")||""}
                       </div>
                     </div>
                     {isAdmin&&<button onClick={()=>setEditingBracket(brackets[activeBracket].id||activeBracket)} style={{background:"transparent",border:`1px solid ${C.orange}`,color:C.orange,padding:"6px 14px",borderRadius:4,cursor:"pointer",fontSize:23,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>✏️ EDIT</button>}
