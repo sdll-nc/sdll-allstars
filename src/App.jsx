@@ -353,12 +353,12 @@ function formatDate(d){if(!d)return"";const[,m,day]=d.split("-");return`${["Jan"
 function formatDateTime(d,t){const ds=formatDate(d);if(!t)return ds;const[h,min]=t.split(":");const hour=parseInt(h);return`${ds} · ${hour%12||12}:${min} ${hour>=12?"PM":"AM"}`;}
 
 // ─── Small UI ─────────────────────────────────────────────────────────────────
-function ColHead({children,style={}}){return<span style={{fontSize:10,fontWeight:700,letterSpacing:2,color:C.textMuted,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif",...style}}>{children}</span>;}
-function WLBadge({result}){const win=result==="W";return<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:26,height:20,borderRadius:3,background:win?"rgba(45,106,45,0.4)":"rgba(232,93,4,0.3)",border:`1px solid ${win?"rgba(45,106,45,0.6)":"rgba(232,93,4,0.5)"}`,color:win?C.greenText:C.orangeText,fontWeight:700,fontSize:10,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{result}</span>;}
+function ColHead({children,style={}}){return<span style={{fontSize:19,fontWeight:700,letterSpacing:2,color:C.textMuted,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif",...style}}>{children}</span>;}
+function WLBadge({result}){const win=result==="W";return<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:26,height:20,borderRadius:3,background:win?"rgba(45,106,45,0.4)":"rgba(232,93,4,0.3)",border:`1px solid ${win?"rgba(45,106,45,0.6)":"rgba(232,93,4,0.5)"}`,color:win?C.greenText:C.orangeText,fontWeight:700,fontSize:19,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{result}</span>;}
 function StatBadge({value,type}){const active=value>0,isW=type==="w";return<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:36,height:28,borderRadius:4,background:active?(isW?C.greenGlow:C.orangeGlow):"rgba(255,255,255,0.04)",border:`1px solid ${active?(isW?"rgba(45,106,45,0.5)":"rgba(232,93,4,0.4)"):"transparent"}`,color:active?(isW?C.greenText:C.orangeText):C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:18}}>{value}</span>;}
-function FormCard({title,children}){return<div style={{background:"rgba(18,18,18,0.98)",borderRadius:8,border:`1px solid ${C.border}`,overflow:"hidden",marginBottom:24}}><div style={{background:`linear-gradient(90deg,${C.green},#1e4d1e)`,borderBottom:`3px solid ${C.orange}`,padding:"12px 20px"}}><span style={{color:C.textPrimary,fontWeight:700,fontSize:14,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{title}</span></div><div style={{padding:20}}>{children}</div></div>;}
-function SectionLabel({children}){return<div style={{color:C.orange,fontSize:12,letterSpacing:2,textTransform:"uppercase",margin:"0 0 10px",fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif"}}>{children}</div>;}
-function Label({children}){return<label style={{display:"block",fontSize:10,letterSpacing:2,textTransform:"uppercase",color:C.textMuted,marginBottom:5,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif"}}>{children}</label>;}
+function FormCard({title,children}){return<div style={{background:"rgba(18,18,18,0.98)",borderRadius:8,border:`1px solid ${C.border}`,overflow:"hidden",marginBottom:24}}><div style={{background:`linear-gradient(90deg,${C.green},#1e4d1e)`,borderBottom:`3px solid ${C.orange}`,padding:"12px 20px"}}><span style={{color:C.textPrimary,fontWeight:700,fontSize:23,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{title}</span></div><div style={{padding:20}}>{children}</div></div>;}
+function SectionLabel({children}){return<div style={{color:C.orange,fontSize:21,letterSpacing:2,textTransform:"uppercase",margin:"0 0 10px",fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif"}}>{children}</div>;}
+function Label({children}){return<label style={{display:"block",fontSize:19,letterSpacing:2,textTransform:"uppercase",color:C.textMuted,marginBottom:5,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif"}}>{children}</label>;}
 function TeamSelect({value,onChange}){return<select value={value} onChange={e=>onChange(e.target.value)} style={inputStyle}><optgroup label="⚾ Baseball">{TEAMS.baseball.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</optgroup><optgroup label="🥎 Softball">{TEAMS.softball.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</optgroup></select>;}
 
 // ─── Bracket Display ──────────────────────────────────────────────────────────
@@ -373,21 +373,21 @@ function BracketGameDisplay({game,roundIndex,gameIndex,onUpdate,isAdmin}){
     <div style={{background:"rgba(15,15,15,0.98)",border:`1px solid ${C.border}`,borderRadius:6,overflow:"hidden"}}>
       {[{team:t1,score:game.score1,isBye:isBye1},{team:t2,score:game.score2,isBye:isBye2}].map((row,i)=>(
         <div key={i} style={{display:"flex",alignItems:"center",padding:"8px 10px",borderBottom:i===0?`1px solid ${C.border}`:"none",background:row.isBye?"rgba(255,255,255,0.02)":winner===row.team?"rgba(45,106,45,0.12)":"transparent"}}>
-          <span style={{flex:1,fontSize:12,fontWeight:winner===row.team?700:400,color:row.isBye?C.textMuted:winner===row.team?C.greenText:C.textSecondary,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontStyle:row.isBye?"italic":"normal"}}>{row.team}</span>
-          {hasResult&&!row.isBye&&<span style={{fontSize:14,fontWeight:700,color:winner===row.team?C.greenText:C.textMuted,marginLeft:8,minWidth:20,textAlign:"right",fontFamily:"'Barlow Condensed', sans-serif"}}>{row.score}</span>}
-          {row.isBye&&<span style={{fontSize:10,color:C.textMuted,marginLeft:8,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>AUTO</span>}
+          <span style={{flex:1,fontSize:21,fontWeight:winner===row.team?700:400,color:row.isBye?C.textMuted:winner===row.team?C.greenText:C.textSecondary,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontStyle:row.isBye?"italic":"normal"}}>{row.team}</span>
+          {hasResult&&!row.isBye&&<span style={{fontSize:23,fontWeight:700,color:winner===row.team?C.greenText:C.textMuted,marginLeft:8,minWidth:20,textAlign:"right",fontFamily:"'Barlow Condensed', sans-serif"}}>{row.score}</span>}
+          {row.isBye&&<span style={{fontSize:19,color:C.textMuted,marginLeft:8,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>AUTO</span>}
         </div>
       ))}
-      {(game.date||game.location)&&<div style={{padding:"4px 10px 5px",background:"rgba(255,255,255,0.02)",fontSize:10,color:C.textMuted,fontFamily:"'Barlow', sans-serif"}}>{game.date&&formatDateTime(game.date,game.time)}{game.date&&game.location&&" · "}{game.location}</div>}
+      {(game.date||game.location)&&<div style={{padding:"4px 10px 5px",background:"rgba(255,255,255,0.02)",fontSize:19,color:C.textMuted,fontFamily:"'Barlow', sans-serif"}}>{game.date&&formatDateTime(game.date,game.time)}{game.date&&game.location&&" · "}{game.location}</div>}
       {isAdmin&&onUpdate&&!hasResult&&!isBye1&&!isBye2&&t1!=="TBD"&&t2!=="TBD"&&(
         !editing
-          ?<button onClick={()=>setEditing(true)} style={{width:"100%",background:"rgba(255,255,255,0.03)",border:"none",borderTop:`1px solid ${C.border}`,color:C.orange,fontSize:11,padding:"5px",cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>+ ENTER RESULT</button>
+          ?<button onClick={()=>setEditing(true)} style={{width:"100%",background:"rgba(255,255,255,0.03)",border:"none",borderTop:`1px solid ${C.border}`,color:C.orange,fontSize:23,padding:"5px",cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>+ ENTER RESULT</button>
           :<div style={{padding:"8px 10px",borderTop:`1px solid ${C.border}`,background:"rgba(255,255,255,0.02)"}}>
             <div style={{display:"flex",gap:6,alignItems:"center"}}>
-              <input type="number" min="0" value={s1} onChange={e=>setS1(e.target.value)} style={{width:"38%",padding:"4px 6px",borderRadius:4,border:`1px solid ${C.border}`,background:"#1a1a1a",color:"#fff",fontSize:13,fontWeight:700,textAlign:"center",fontFamily:"'Barlow Condensed', sans-serif"}}/>
+              <input type="number" min="0" value={s1} onChange={e=>setS1(e.target.value)} style={{width:"38%",padding:"4px 6px",borderRadius:4,border:`1px solid ${C.border}`,background:"#1a1a1a",color:"#fff",fontSize:19,fontWeight:700,textAlign:"center",fontFamily:"'Barlow Condensed', sans-serif"}}/>
               <span style={{color:C.textMuted,fontSize:11}}>–</span>
-              <input type="number" min="0" value={s2} onChange={e=>setS2(e.target.value)} style={{width:"38%",padding:"4px 6px",borderRadius:4,border:`1px solid ${C.border}`,background:"#1a1a1a",color:"#fff",fontSize:13,fontWeight:700,textAlign:"center",fontFamily:"'Barlow Condensed', sans-serif"}}/>
-              <button onClick={()=>{if(s1===""||s2==="")return;onUpdate(roundIndex,gameIndex,parseInt(s1),parseInt(s2));setEditing(false);setS1("");setS2("");}} style={{flex:1,background:C.green,border:"none",color:"#fff",borderRadius:4,padding:"5px 4px",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif"}}>✓</button>
+              <input type="number" min="0" value={s2} onChange={e=>setS2(e.target.value)} style={{width:"38%",padding:"4px 6px",borderRadius:4,border:`1px solid ${C.border}`,background:"#1a1a1a",color:"#fff",fontSize:19,fontWeight:700,textAlign:"center",fontFamily:"'Barlow Condensed', sans-serif"}}/>
+              <button onClick={()=>{if(s1===""||s2==="")return;onUpdate(roundIndex,gameIndex,parseInt(s1),parseInt(s2));setEditing(false);setS1("");setS2("");}} style={{flex:1,background:C.green,border:"none",color:"#fff",borderRadius:4,padding:"5px 4px",cursor:"pointer",fontSize:23,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif"}}>✓</button>
               <button onClick={()=>setEditing(false)} style={{background:"transparent",border:`1px solid ${C.border}`,color:C.textMuted,borderRadius:4,padding:"5px 6px",cursor:"pointer",fontSize:11}}>✕</button>
             </div>
           </div>
@@ -403,7 +403,7 @@ function BracketView({bracket,onUpdateGame,isAdmin}){
       <div style={{display:"flex",gap:0,minWidth:bracket.rounds.length*200}}>
         {bracket.rounds.map((round,ri)=>(
           <div key={ri} style={{flex:1,minWidth:190}}>
-            <div style={{background:ri===bracket.rounds.length-1?C.orange:C.green,color:"#fff",padding:"8px 12px",fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",textAlign:"center",margin:"0 4px 12px",borderRadius:4,fontFamily:"'Barlow Condensed', sans-serif"}}>{round.name}</div>
+            <div style={{background:ri===bracket.rounds.length-1?C.orange:C.green,color:"#fff",padding:"8px 12px",fontSize:23,fontWeight:700,letterSpacing:2,textTransform:"uppercase",textAlign:"center",margin:"0 4px 12px",borderRadius:4,fontFamily:"'Barlow Condensed', sans-serif"}}>{round.name}</div>
             <div style={{display:"flex",flexDirection:"column",gap:10,padding:"0 4px"}}>
               {round.games.map((game,gi)=><BracketGameDisplay key={gi} game={game} gameIndex={gi} roundIndex={ri} isAdmin={isAdmin} onUpdate={isAdmin&&onUpdateGame?onUpdateGame:null}/>)}
             </div>
@@ -428,31 +428,31 @@ function BracketEditor({bracket,onSave,onCancel,saving}){
       {rounds.map((round,ri)=>(
         <div key={ri} style={{background:"rgba(255,255,255,0.03)",border:`1px solid ${C.border}`,borderRadius:8,padding:16,marginBottom:12}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-            <input type="text" value={round.name} onChange={e=>updateRoundName(ri,e.target.value)} style={{...inputStyle,flex:1,padding:"7px 10px",fontSize:14,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}/>
+            <input type="text" value={round.name} onChange={e=>updateRoundName(ri,e.target.value)} style={{...inputStyle,flex:1,padding:"7px 10px",fontSize:23,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}/>
             <button onClick={()=>removeRound(ri)} style={{...deleteBtn,padding:"6px 12px",fontSize:12}}>Remove</button>
           </div>
           {round.games.map((game,gi)=>(
             <div key={gi} style={{display:"flex",gap:8,alignItems:"center",marginBottom:8,background:"rgba(0,0,0,0.2)",padding:"10px 12px",borderRadius:6,border:`1px solid ${C.border}`}}>
-              <span style={{fontSize:11,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,width:20,flexShrink:0}}>G{gi+1}</span>
+              <span style={{fontSize:23,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,width:20,flexShrink:0}}>G{gi+1}</span>
               <div style={{flex:1}}><input type="text" placeholder="Team 1" value={game.team1} onChange={e=>updateGame(ri,gi,"team1",e.target.value)} style={{...inputStyle,padding:"7px 10px",fontSize:13}}/></div>
-              <span style={{color:C.textMuted,fontSize:12,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,flexShrink:0}}>vs</span>
+              <span style={{color:C.textMuted,fontSize:21,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,flexShrink:0}}>vs</span>
               <div style={{flex:1}}><input type="text" placeholder='Team 2 or "BYE"' value={game.team2} onChange={e=>updateGame(ri,gi,"team2",e.target.value)} style={{...inputStyle,padding:"7px 10px",fontSize:13}}/></div>
               <div style={{display:"flex",gap:4,flexShrink:0}}>
                 <input type="date" value={game.date||""} onChange={e=>updateGame(ri,gi,"date",e.target.value)} style={{...inputStyle,width:120,padding:"7px 8px",fontSize:11}}/>
                 <input type="time" value={game.time||""} onChange={e=>updateGame(ri,gi,"time",e.target.value)} style={{...inputStyle,width:80,padding:"7px 8px",fontSize:11}}/>
               </div>
               <div style={{flex:1.2}}><input type="text" placeholder="Location" value={game.location||""} onChange={e=>updateGame(ri,gi,"location",e.target.value)} style={{...inputStyle,padding:"7px 10px",fontSize:11}}/></div>
-              {game.score1!==undefined&&<span style={{fontSize:12,color:C.greenText,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,flexShrink:0,minWidth:40,textAlign:"center"}}>{game.score1}–{game.score2}</span>}
+              {game.score1!==undefined&&<span style={{fontSize:21,color:C.greenText,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,flexShrink:0,minWidth:40,textAlign:"center"}}>{game.score1}–{game.score2}</span>}
               <button onClick={()=>removeGame(ri,gi)} style={{...deleteBtn,padding:"4px 8px",flexShrink:0}}>✕</button>
             </div>
           ))}
-          <button onClick={()=>addGame(ri)} style={{background:"transparent",border:`1px dashed ${C.border}`,color:C.textMuted,width:"100%",padding:"8px",borderRadius:6,cursor:"pointer",fontSize:12,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginTop:4}}>+ Add Game</button>
+          <button onClick={()=>addGame(ri)} style={{background:"transparent",border:`1px dashed ${C.border}`,color:C.textMuted,width:"100%",padding:"8px",borderRadius:6,cursor:"pointer",fontSize:21,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginTop:4}}>+ Add Game</button>
         </div>
       ))}
-      <button onClick={addRound} style={{background:"transparent",border:`1px dashed ${C.border}`,color:C.textMuted,width:"100%",padding:"10px",borderRadius:6,cursor:"pointer",fontSize:12,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:16}}>+ Add Round</button>
+      <button onClick={addRound} style={{background:"transparent",border:`1px dashed ${C.border}`,color:C.textMuted,width:"100%",padding:"10px",borderRadius:6,cursor:"pointer",fontSize:21,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:16}}>+ Add Round</button>
       <div style={{display:"flex",gap:10}}>
         <button onClick={()=>onSave(rounds)} style={{...primaryBtn,flex:1}}>{saving?"Saving…":"Save Changes"}</button>
-        <button onClick={onCancel} style={{background:"transparent",border:`1px solid ${C.border}`,color:C.textMuted,padding:"13px 20px",borderRadius:6,cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",fontSize:14,letterSpacing:1}}>Cancel</button>
+        <button onClick={onCancel} style={{background:"transparent",border:`1px solid ${C.border}`,color:C.textMuted,padding:"13px 20px",borderRadius:6,cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",fontSize:23,letterSpacing:1}}>Cancel</button>
       </div>
     </FormCard>
   );
@@ -613,7 +613,7 @@ export default function App(){
   const teamName=id=>ALL_TEAMS.find(t=>t.id===id)?.name||id;
   const teamDiv=id=>TEAMS.baseball.find(t=>t.id===id)?"Baseball":"Softball";
 
-  if(!loaded)return(<div style={{minHeight:"100vh",background:C.dark,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16}}><style>{FONT_IMPORT}</style><div style={{width:36,height:36,border:"3px solid rgba(255,255,255,0.1)",borderTop:`3px solid ${C.orange}`,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/><div style={{color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontSize:14,letterSpacing:3}}>LOADING…</div></div>);
+  if(!loaded)return(<div style={{minHeight:"100vh",background:C.dark,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16}}><style>{FONT_IMPORT}</style><div style={{width:36,height:36,border:"3px solid rgba(255,255,255,0.1)",borderTop:`3px solid ${C.orange}`,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/><div style={{color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontSize:23,letterSpacing:3}}>LOADING…</div></div>);
   if(dbError)return(<div style={{minHeight:"100vh",background:C.dark,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}><style>{FONT_IMPORT}</style><div style={{background:"rgba(20,20,20,0.98)",border:`1px solid ${C.border}`,borderRadius:8,padding:32,textAlign:"center",maxWidth:400}}><div style={{fontSize:32,marginBottom:12}}>⚠️</div><div style={{color:C.textSecondary,fontFamily:"'Barlow', sans-serif",marginBottom:20}}>{dbError}</div><button onClick={loadAll} style={{...primaryBtn,width:"auto",padding:"10px 28px"}}>Retry</button></div></div>);
 
   return(
@@ -631,7 +631,7 @@ export default function App(){
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
                 <div style={{width:4,height:16,background:C.orange,borderRadius:2}}/>
-                <span style={{fontSize:11,letterSpacing:3,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,textTransform:"uppercase"}}>NC District 6</span>
+                <span style={{fontSize:23,letterSpacing:3,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,textTransform:"uppercase"}}>NC District 6</span>
               </div>
               <div style={{display:"flex",gap:8}}>
                 {isAdmin
@@ -642,21 +642,21 @@ export default function App(){
             </div>
             <div style={{display:"flex",alignItems:"flex-end",gap:20,marginBottom:24}}>
               <div style={{width:68,height:68,borderRadius:"50%",background:"linear-gradient(145deg,#2D6A2D,#1a3d1a)",border:`3px solid ${C.orange}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 20px rgba(232,93,4,0.35),inset 0 1px 0 rgba(255,255,255,0.1)",lineHeight:1}}>
-                <span style={{fontSize:11,fontWeight:700,color:C.orange,letterSpacing:1,fontFamily:"'Barlow Condensed', sans-serif"}}>SDLL</span>
-                <span style={{fontSize:22,marginTop:1}}>⚾</span>
+                <span style={{fontSize:23,fontWeight:700,color:C.orange,letterSpacing:1,fontFamily:"'Barlow Condensed', sans-serif"}}>SDLL</span>
+                <span style={{fontSize:25,marginTop:1}}>⚾</span>
               </div>
               <div style={{flex:1}}>
-                <div style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:"clamp(13px,3vw,16px)",letterSpacing:5,color:C.orange,marginBottom:2}}>South Durham Little League</div>
-                <div style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:"clamp(36px,8vw,62px)",letterSpacing:3,lineHeight:0.9,color:C.textPrimary,textShadow:"0 2px 20px rgba(0,0,0,0.5)"}}>2026 ALL STAR</div>
-                <div style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:"clamp(22px,5vw,36px)",letterSpacing:6,color:C.green,WebkitTextStroke:"1px #4a9e4a",textShadow:"0 0 30px rgba(45,106,45,0.4)"}}>SCOREBOARD</div>
+                <div style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:"clamp(16px,3vw,20px)",letterSpacing:5,color:C.orange,marginBottom:2}}>South Durham Little League</div>
+                <div style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:"clamp(42px,8vw,70px)",letterSpacing:3,lineHeight:0.9,color:C.textPrimary,textShadow:"0 2px 20px rgba(0,0,0,0.5)"}}>2026 ALL STAR</div>
+                <div style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:"clamp(26px,5vw,42px)",letterSpacing:6,color:C.green,WebkitTextStroke:"1px #4a9e4a",textShadow:"0 0 30px rgba(45,106,45,0.4)"}}>SCOREBOARD</div>
               </div>
             </div>
             <div style={{height:3,background:"linear-gradient(90deg,#E85D04,#ff9a4a,#E85D04)",backgroundSize:"200% 100%",animation:"shimmer 3s linear infinite",margin:"0 -20px"}}/>
             {view!=="admin"&&view!=="login"&&(
               <div style={{display:"flex",gap:2}}>
                 {[{key:"baseball",label:"⚾  Baseball",count:TEAMS.baseball.length},{key:"softball",label:"🥎  Softball",count:TEAMS.softball.length},{key:"brackets",label:"🏆  Brackets",count:brackets.length}].map(tab=>(
-                  <button key={tab.key} className="tab-btn" onClick={()=>{setView(tab.key);setExpanded(null);}} style={{background:view===tab.key?"rgba(255,255,255,0.07)":"transparent",border:"none",borderBottom:view===tab.key?`3px solid ${C.orange}`:"3px solid transparent",color:view===tab.key?C.textPrimary:C.textMuted,padding:"12px 18px 10px",cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:14,letterSpacing:2,textTransform:"uppercase",borderRadius:"4px 4px 0 0",marginTop:6}}>
-                    {tab.label}{tab.count>0&&<span style={{marginLeft:7,background:view===tab.key?C.orange:"rgba(255,255,255,0.08)",color:"#fff",borderRadius:10,padding:"1px 7px",fontSize:10,fontWeight:700}}>{tab.count}</span>}
+                  <button key={tab.key} className="tab-btn" onClick={()=>{setView(tab.key);setExpanded(null);}} style={{background:view===tab.key?"rgba(255,255,255,0.07)":"transparent",border:"none",borderBottom:view===tab.key?`3px solid ${C.orange}`:"3px solid transparent",color:view===tab.key?C.textPrimary:C.textMuted,padding:"14px 20px 12px",cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:23,letterSpacing:2,textTransform:"uppercase",borderRadius:"4px 4px 0 0",marginTop:6}}>
+                    {tab.label}{tab.count>0&&<span style={{marginLeft:7,background:view===tab.key?C.orange:"rgba(255,255,255,0.08)",color:"#fff",borderRadius:10,padding:"1px 7px",fontSize:19,fontWeight:700}}>{tab.count}</span>}
                   </button>
                 ))}
               </div>
@@ -672,14 +672,14 @@ export default function App(){
             <div style={{maxWidth:380,margin:"40px auto"}}>
               <div style={{background:"rgba(15,15,15,0.98)",borderRadius:8,border:`1px solid ${C.border}`,overflow:"hidden"}}>
                 <div style={{background:`linear-gradient(135deg,${C.green},#1a3d1a)`,padding:"22px 24px 18px",textAlign:"center",borderBottom:`4px solid ${C.orange}`}}>
-                  <div style={{fontSize:28,marginBottom:6}}>🔒</div>
-                  <div style={{color:C.textPrimary,fontWeight:700,fontSize:16,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>BOARD MEMBER ACCESS</div>
-                  <div style={{color:C.textMuted,fontSize:12,marginTop:3}}>Manage results, schedules & brackets</div>
+                  <div style={{fontSize:32,marginBottom:6}}>🔒</div>
+                  <div style={{color:C.textPrimary,fontWeight:700,fontSize:19,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>BOARD MEMBER ACCESS</div>
+                  <div style={{color:C.textMuted,fontSize:21,marginTop:3}}>Manage results, schedules & brackets</div>
                 </div>
                 <div style={{padding:24}}>
                   <Label>Password</Label>
                   <input type="password" placeholder="Enter password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()} style={{...inputStyle,borderColor:authError?C.orange:"rgba(255,255,255,0.1)",marginBottom:authError?6:16}}/>
-                  {authError&&<div style={{color:C.orange,fontSize:12,marginBottom:14,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>Incorrect password.</div>}
+                  {authError&&<div style={{color:C.orange,fontSize:21,marginBottom:14,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>Incorrect password.</div>}
                   <button onClick={handleLogin} style={primaryBtn}>Sign In</button>
                 </div>
               </div>
@@ -720,24 +720,24 @@ export default function App(){
                   const displayNum=isElim?"—":String(activeIdx+1).padStart(2,"0");
                   return(
                     <div key={team.id} className="team-row" style={{marginBottom:4,borderRadius:6,overflow:"hidden",border:`1px solid ${isExpanded?C.borderActive:C.border}`,boxShadow:isExpanded?`0 4px 24px ${C.orangeGlow}`:"none",animation:`fadeSlideIn 0.3s ease ${i*0.03}s both`,opacity:isElim?0.6:1}}>
-                      <div onClick={()=>setExpanded(p=>p===team.id?null:team.id)} style={{display:"flex",alignItems:"center",padding:"13px 16px",cursor:"pointer",background:isExpanded?`linear-gradient(90deg,rgba(232,93,4,0.1) 0%,${C.cardHover} 100%)`:C.card,borderLeft:`3px solid ${isExpanded?C.orange:isElim?"rgba(255,255,255,0.1)":"transparent"}`}}>
-                        <span style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:13,color:isElim?C.textMuted:"rgba(255,255,255,0.2)",width:24,flexShrink:0}}>{displayNum}</span>
+                      <div onClick={()=>setExpanded(p=>p===team.id?null:team.id)} style={{display:"flex",alignItems:"center",padding:"16px 18px",cursor:"pointer",background:isExpanded?`linear-gradient(90deg,rgba(232,93,4,0.1) 0%,${C.cardHover} 100%)`:C.card,borderLeft:`3px solid ${isExpanded?C.orange:isElim?"rgba(255,255,255,0.1)":"transparent"}`}}>
+                        <span style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:19,color:isElim?C.textMuted:"rgba(255,255,255,0.2)",width:24,flexShrink:0}}>{displayNum}</span>
                         <div style={{flex:1,marginLeft:8}}>
-                          <div style={{fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:17,letterSpacing:1,color:isExpanded?C.textPrimary:C.textSecondary,textDecoration:isElim?"line-through":"none",textDecorationColor:"rgba(255,255,255,0.3)"}}>
-                            {team.name}{isElim&&<span style={{marginLeft:8,fontSize:10,letterSpacing:2,color:C.textMuted,fontWeight:600,textDecoration:"none",verticalAlign:"middle"}}>ELIMINATED</span>}
+                          <div style={{fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:23,letterSpacing:1,color:isExpanded?C.textPrimary:C.textSecondary,textDecoration:isElim?"line-through":"none",textDecorationColor:"rgba(255,255,255,0.3)"}}>
+                            {team.name}{isElim&&<span style={{marginLeft:8,fontSize:19,letterSpacing:2,color:C.textMuted,fontWeight:600,textDecoration:"none",verticalAlign:"middle"}}>ELIMINATED</span>}
                           </div>
-                          {(teamGames.length>0||upcoming.length>0)&&<div style={{fontSize:11,color:C.textMuted,marginTop:1}}>{teamGames.length>0?`${teamGames.length} result${teamGames.length!==1?"s":""}`:""}{upcoming.length>0?` · ${upcoming.length} upcoming`:""}</div>}
+                          {(teamGames.length>0||upcoming.length>0)&&<div style={{fontSize:23,color:C.textMuted,marginTop:1}}>{teamGames.length>0?`${teamGames.length} result${teamGames.length!==1?"s":""}`:""}{upcoming.length>0?` · ${upcoming.length} upcoming`:""}</div>}
                         </div>
                         <div style={{width:52,textAlign:"center"}}><StatBadge value={rec.w} type="w"/></div>
                         <div style={{width:52,textAlign:"center"}}><StatBadge value={rec.l} type="l"/></div>
-                        <div style={{width:68,textAlign:"center",fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:16,color:rec.w+rec.l>0?C.textPrimary:C.textMuted}}>{pct(rec.w,rec.l)}</div>
-                        <div style={{width:32,textAlign:"center",color:isExpanded?C.orange:C.textMuted,fontSize:11,transform:isExpanded?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s,color 0.2s"}}>▼</div>
+                        <div style={{width:68,textAlign:"center",fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,fontSize:19,color:rec.w+rec.l>0?C.textPrimary:C.textMuted}}>{pct(rec.w,rec.l)}</div>
+                        <div style={{width:32,textAlign:"center",color:isExpanded?C.orange:C.textMuted,fontSize:23,transform:isExpanded?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s,color 0.2s"}}>▼</div>
                       </div>
                       {isExpanded&&(
                         <div style={{background:"rgba(10,10,10,0.98)",borderTop:`1px solid ${C.border}`}}>
                           {upcoming.length>0&&(
                             <div>
-                              <div style={{padding:"8px 16px 6px 48px",background:"rgba(255,180,0,0.05)",borderBottom:"1px solid rgba(255,180,0,0.1)"}}><span style={{fontSize:10,fontWeight:700,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif"}}>📅 Upcoming</span></div>
+                              <div style={{padding:"8px 16px 6px 48px",background:"rgba(255,180,0,0.05)",borderBottom:"1px solid rgba(255,180,0,0.1)"}}><span style={{fontSize:19,fontWeight:700,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif"}}>📅 Upcoming</span></div>
                               {upcoming.map(g=>(
                                 <div key={g.id} style={{display:"flex",alignItems:"center",padding:"9px 16px 9px 48px",borderBottom:`1px solid ${C.border}`,background:"rgba(255,180,0,0.02)",fontSize:12}}>
                                   <span style={{width:130,color:"#f59e0b",fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5}}>{formatDateTime(g.date,g.time)}</span>
@@ -754,29 +754,29 @@ export default function App(){
                               </div>
                               {teamGames.map((g,gi)=>(
                                 <div key={g.id} style={{display:"flex",alignItems:"center",padding:"10px 16px 10px 48px",borderBottom:gi<teamGames.length-1?`1px solid ${C.border}`:"none",background:gi%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
-                                  <span style={{width:72,fontSize:12,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,letterSpacing:0.5}}>{formatDate(g.date)}</span>
-                                  <span style={{flex:1,fontSize:13,color:C.textSecondary}}>vs. {g.opponent}</span>
-                                  <span style={{width:64,textAlign:"center",fontSize:14,fontWeight:700,color:C.textPrimary,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{g.teamScore}–{g.oppScore}</span>
+                                  <span style={{width:72,fontSize:21,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,letterSpacing:0.5}}>{formatDate(g.date)}</span>
+                                  <span style={{flex:1,fontSize:19,color:C.textSecondary}}>vs. {g.opponent}</span>
+                                  <span style={{width:64,textAlign:"center",fontSize:23,fontWeight:700,color:C.textPrimary,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{g.teamScore}–{g.oppScore}</span>
                                   <div style={{width:50,textAlign:"center"}}><WLBadge result={g.result}/></div>
-                                  <span style={{flex:0.8,textAlign:"right",fontSize:10,color:g.round?C.orange:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,letterSpacing:1,textTransform:"uppercase"}}>{g.round||"—"}</span>
+                                  <span style={{flex:0.8,textAlign:"right",fontSize:19,color:g.round?C.orange:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,letterSpacing:1,textTransform:"uppercase"}}>{g.round||"—"}</span>
                                 </div>
                               ))}
                               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 20px 10px 48px",background:`linear-gradient(90deg,rgba(232,93,4,0.06),transparent)`,borderTop:`1px solid rgba(232,93,4,0.15)`}}>
-                                <span style={{fontSize:10,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,letterSpacing:2,textTransform:"uppercase"}}>Season Record</span>
-                                <span style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:20,letterSpacing:2,color:C.textPrimary}}>{rec.w}–{rec.l}<span style={{fontSize:13,color:C.textMuted,marginLeft:12,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600}}>{pct(rec.w,rec.l)} PCT</span></span>
+                                <span style={{fontSize:19,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,letterSpacing:2,textTransform:"uppercase"}}>Season Record</span>
+                                <span style={{fontFamily:"'Bebas Neue', sans-serif",fontSize:23,letterSpacing:2,color:C.textPrimary}}>{rec.w}–{rec.l}<span style={{fontSize:19,color:C.textMuted,marginLeft:12,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600}}>{pct(rec.w,rec.l)} PCT</span></span>
                               </div>
                             </div>
                           ):(
-                            <div style={{padding:"24px 20px",textAlign:"center",color:C.textMuted,fontSize:13,fontStyle:"italic"}}>No games recorded yet. Check back after their first game!</div>
+                            <div style={{padding:"24px 20px",textAlign:"center",color:C.textMuted,fontSize:19,fontStyle:"italic"}}>No games recorded yet. Check back after their first game!</div>
                           )}
                           {isAdmin&&(
                             <div style={{padding:"12px 20px 12px 48px",borderTop:`1px solid ${C.border}`,background:"rgba(255,255,255,0.02)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                              <span style={{fontSize:11,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1,textTransform:"uppercase"}}>Tournament Status</span>
+                              <span style={{fontSize:23,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1,textTransform:"uppercase"}}>Tournament Status</span>
                               <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
                                 <div onClick={()=>toggleEliminated(team.id)} style={{width:40,height:22,borderRadius:11,background:isElim?"rgba(232,93,4,0.4)":"rgba(255,255,255,0.1)",border:`1px solid ${isElim?C.orange:C.border}`,position:"relative",transition:"all 0.2s",cursor:"pointer"}}>
                                   <div style={{position:"absolute",top:2,left:isElim?20:2,width:16,height:16,borderRadius:"50%",background:isElim?C.orange:"rgba(255,255,255,0.3)",transition:"left 0.2s,background 0.2s"}}/>
                                 </div>
-                                <span style={{fontSize:11,color:isElim?C.orange:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}>{isElim?"Eliminated":"Still Competing"}</span>
+                                <span style={{fontSize:23,color:isElim?C.orange:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}>{isElim?"Eliminated":"Still Competing"}</span>
                               </label>
                             </div>
                           )}
@@ -785,7 +785,7 @@ export default function App(){
                     </div>
                   );
                 })}
-                <div style={{marginTop:16,textAlign:"center",fontSize:10,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:2,textTransform:"uppercase"}}>Tap any team to see their schedule & results</div>
+                <div style={{marginTop:16,textAlign:"center",fontSize:19,color:C.textMuted,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:2,textTransform:"uppercase"}}>Tap any team to see their schedule & results</div>
               </div>
             );
           })()}
@@ -796,7 +796,7 @@ export default function App(){
               {brackets.length>1&&(
                 <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
                   {brackets.map((b,i)=>(
-                    <button key={b.id||i} onClick={()=>setActiveBracket(i)} style={{background:activeBracket===i?C.green:"rgba(20,20,20,0.97)",border:`1px solid ${activeBracket===i?C.green:C.border}`,color:activeBracket===i?C.textPrimary:C.textSecondary,padding:"7px 14px",borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5}}>{b.title}</button>
+                    <button key={b.id||i} onClick={()=>setActiveBracket(i)} style={{background:activeBracket===i?C.green:"rgba(20,20,20,0.97)",border:`1px solid ${activeBracket===i?C.green:C.border}`,color:activeBracket===i?C.textPrimary:C.textSecondary,padding:"7px 14px",borderRadius:6,cursor:"pointer",fontSize:21,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5}}>{b.title}</button>
                   ))}
                 </div>
               )}
@@ -804,13 +804,13 @@ export default function App(){
                 <div style={{background:"rgba(15,15,15,0.98)",borderRadius:8,overflow:"hidden",border:`1px solid ${C.border}`}}>
                   <div style={{background:`linear-gradient(90deg,${C.green},#1a3d1a)`,borderBottom:`4px solid ${C.orange}`,padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                     <div>
-                      <div style={{color:C.textPrimary,fontWeight:700,fontSize:18,fontFamily:"'Bebas Neue', sans-serif",letterSpacing:2}}>🏆 {brackets[activeBracket].title}</div>
-                      <div style={{color:C.textMuted,fontSize:11,marginTop:2,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>
+                      <div style={{color:C.textPrimary,fontWeight:700,fontSize:21,fontFamily:"'Bebas Neue', sans-serif",letterSpacing:2}}>🏆 {brackets[activeBracket].title}</div>
+                      <div style={{color:C.textMuted,fontSize:23,marginTop:2,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>
                         {brackets[activeBracket].type==="double-elim"?"Double Elimination":brackets[activeBracket].type==="single-elim"?"Single Elimination":brackets[activeBracket].type==="pool-play"?"Pool Play":"Custom Format"}
                         {" · "}{brackets[activeBracket].teamNames?.join(", ")||""}
                       </div>
                     </div>
-                    {isAdmin&&<button onClick={()=>setEditingBracket(brackets[activeBracket].id||activeBracket)} style={{background:"transparent",border:`1px solid ${C.orange}`,color:C.orange,padding:"6px 14px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>✏️ EDIT</button>}
+                    {isAdmin&&<button onClick={()=>setEditingBracket(brackets[activeBracket].id||activeBracket)} style={{background:"transparent",border:`1px solid ${C.orange}`,color:C.orange,padding:"6px 14px",borderRadius:4,cursor:"pointer",fontSize:23,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>✏️ EDIT</button>}
                   </div>
                   <div style={{padding:16}}>
                     <BracketView bracket={brackets[activeBracket]} isAdmin={isAdmin} onUpdateGame={isAdmin?(ri,gi,s1,s2)=>handleUpdateBracketGame(brackets[activeBracket].id||activeBracket,ri,gi,s1,s2):null}/>
@@ -831,7 +831,7 @@ export default function App(){
                 <>
                   <div style={{display:"flex",gap:4,marginBottom:20,borderBottom:`1px solid ${C.border}`}}>
                     {[{key:"result",label:"📋 Enter Result"},{key:"schedule",label:"📅 Add Game"},{key:"bracket",label:"🏆 Brackets"}].map(t=>(
-                      <button key={t.key} onClick={()=>setAdminTab(t.key)} style={{background:adminTab===t.key?"rgba(255,255,255,0.06)":"transparent",border:"none",borderBottom:adminTab===t.key?`3px solid ${C.orange}`:"3px solid transparent",color:adminTab===t.key?C.textPrimary:C.textMuted,padding:"9px 16px",cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1,textTransform:"uppercase",borderRadius:"4px 4px 0 0"}}>{t.label}</button>
+                      <button key={t.key} onClick={()=>setAdminTab(t.key)} style={{background:adminTab===t.key?"rgba(255,255,255,0.06)":"transparent",border:"none",borderBottom:adminTab===t.key?`3px solid ${C.orange}`:"3px solid transparent",color:adminTab===t.key?C.textPrimary:C.textMuted,padding:"9px 16px",cursor:"pointer",fontSize:19,fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1,textTransform:"uppercase",borderRadius:"4px 4px 0 0"}}>{t.label}</button>
                     ))}
                   </div>
 
@@ -841,13 +841,13 @@ export default function App(){
                         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:4}}>
                           <div style={{gridColumn:"1 / -1"}}><Label>Team</Label><TeamSelect value={resultForm.teamId} onChange={v=>setResultForm(f=>({...f,teamId:v}))}/></div>
                           <div style={{gridColumn:"1 / -1"}}><Label>Opponent</Label><input type="text" placeholder="e.g. Bull City Little League" value={resultForm.opponent} onChange={e=>setResultForm(f=>({...f,opponent:e.target.value}))} style={inputStyle}/></div>
-                          <div><Label>SDLL Score</Label><input type="number" min="0" value={resultForm.teamScore} onChange={e=>{const ts=e.target.value;const result=ts!==""&&resultForm.oppScore!==""?(parseInt(ts)>=parseInt(resultForm.oppScore)?"W":"L"):resultForm.result;setResultForm(f=>({...f,teamScore:ts,result}));}} style={{...inputStyle,fontSize:24,fontWeight:700,textAlign:"center",color:C.greenText}}/></div>
-                          <div><Label>Opponent Score</Label><input type="number" min="0" value={resultForm.oppScore} onChange={e=>{const os=e.target.value;const result=resultForm.teamScore!==""&&os!==""?(parseInt(resultForm.teamScore)>=parseInt(os)?"W":"L"):resultForm.result;setResultForm(f=>({...f,oppScore:os,result}));}} style={{...inputStyle,fontSize:24,fontWeight:700,textAlign:"center",color:C.orangeText}}/></div>
+                          <div><Label>SDLL Score</Label><input type="number" min="0" value={resultForm.teamScore} onChange={e=>{const ts=e.target.value;const result=ts!==""&&resultForm.oppScore!==""?(parseInt(ts)>=parseInt(resultForm.oppScore)?"W":"L"):resultForm.result;setResultForm(f=>({...f,teamScore:ts,result}));}} style={{...inputStyle,fontSize:27,fontWeight:700,textAlign:"center",color:C.greenText}}/></div>
+                          <div><Label>Opponent Score</Label><input type="number" min="0" value={resultForm.oppScore} onChange={e=>{const os=e.target.value;const result=resultForm.teamScore!==""&&os!==""?(parseInt(resultForm.teamScore)>=parseInt(os)?"W":"L"):resultForm.result;setResultForm(f=>({...f,oppScore:os,result}));}} style={{...inputStyle,fontSize:27,fontWeight:700,textAlign:"center",color:C.orangeText}}/></div>
                           <div><Label>Date</Label><input type="date" value={resultForm.date} onChange={e=>setResultForm(f=>({...f,date:e.target.value}))} style={inputStyle}/></div>
                           <div><Label>Round (optional)</Label><input type="text" placeholder="e.g. District Semis" value={resultForm.round} onChange={e=>setResultForm(f=>({...f,round:e.target.value}))} style={inputStyle}/></div>
                         </div>
                         {resultForm.teamScore!==""&&resultForm.oppScore!==""&&(
-                          <div style={{margin:"16px 0",padding:"10px 16px",background:resultForm.result==="W"?"rgba(45,106,45,0.15)":"rgba(232,93,4,0.12)",border:`1px solid ${resultForm.result==="W"?"rgba(45,106,45,0.3)":"rgba(232,93,4,0.3)"}`,borderRadius:6,fontSize:14,fontWeight:700,color:resultForm.result==="W"?C.greenText:C.orangeText,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>
+                          <div style={{margin:"16px 0",padding:"10px 16px",background:resultForm.result==="W"?"rgba(45,106,45,0.15)":"rgba(232,93,4,0.12)",border:`1px solid ${resultForm.result==="W"?"rgba(45,106,45,0.3)":"rgba(232,93,4,0.3)"}`,borderRadius:6,fontSize:23,fontWeight:700,color:resultForm.result==="W"?C.greenText:C.orangeText,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>
                             {resultForm.result==="W"?"✓ WIN":"✗ LOSS"} — {teamName(resultForm.teamId)} {resultForm.teamScore}, {resultForm.opponent||"Opponent"} {resultForm.oppScore}
                           </div>
                         )}
@@ -865,7 +865,7 @@ export default function App(){
                               <span style={{flex:1,color:C.textSecondary}}>vs. {g.opponent}</span>
                               <span style={{fontWeight:700,color:C.textPrimary,fontFamily:"'Barlow Condensed', sans-serif"}}>{g.teamScore}–{g.oppScore}</span>
                               <span style={{color:C.textMuted,fontSize:11}}>{formatDate(g.date)}</span>
-                              {g.round&&<span style={{background:C.green,color:"#fff",borderRadius:3,padding:"1px 7px",fontSize:10,fontWeight:700}}>{g.round}</span>}
+                              {g.round&&<span style={{background:C.green,color:"#fff",borderRadius:3,padding:"1px 7px",fontSize:19,fontWeight:700}}>{g.round}</span>}
                               <button onClick={()=>handleDeleteResult(g)} style={deleteBtn}>✕</button>
                             </div>
                           ))}
@@ -893,7 +893,7 @@ export default function App(){
                           <SectionLabel>Scheduled Games</SectionLabel>
                           {ALL_TEAMS.filter(t=>schedule[t.id]?.length>0).map(team=>(
                             <div key={team.id} style={{marginBottom:16}}>
-                              <div style={{fontWeight:700,color:C.greenText,fontSize:13,marginBottom:6,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{teamDiv(team.id)} — {team.name}</div>
+                              <div style={{fontWeight:700,color:C.greenText,fontSize:19,marginBottom:6,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{teamDiv(team.id)} — {team.name}</div>
                               {(schedule[team.id]||[]).map(g=>(
                                 <div key={g.id} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.orange}`,borderRadius:6,marginBottom:5,padding:"8px 14px",display:"flex",alignItems:"center",gap:10,fontSize:12}}>
                                   <span style={{color:"#f59e0b",fontWeight:700,minWidth:100,fontFamily:"'Barlow Condensed', sans-serif"}}>{formatDateTime(g.date,g.time)}</span>
@@ -915,16 +915,16 @@ export default function App(){
                       {brackets.map((b,i)=>(
                         <div key={b.id||i} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.green}`,borderRadius:6,padding:"12px 16px",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                           <div>
-                            <div style={{fontWeight:700,color:C.greenText,fontSize:14,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>🏆 {b.title}</div>
-                            <div style={{fontSize:11,color:C.textMuted,marginTop:2,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{b.type==="double-elim"?"Double Elimination":b.type==="pool-play"?"Pool Play":"Single Elimination"} · {b.teamNames?.length||0} teams · {b.rounds?.reduce((a,r)=>a+r.games.length,0)||0} games</div>
+                            <div style={{fontWeight:700,color:C.greenText,fontSize:23,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>🏆 {b.title}</div>
+                            <div style={{fontSize:23,color:C.textMuted,marginTop:2,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>{b.type==="double-elim"?"Double Elimination":b.type==="pool-play"?"Pool Play":"Single Elimination"} · {b.teamNames?.length||0} teams · {b.rounds?.reduce((a,r)=>a+r.games.length,0)||0} games</div>
                           </div>
                           <div style={{display:"flex",gap:8}}>
-                            <button onClick={()=>setEditingBracket(b.id||i)} style={{background:"transparent",border:`1px solid ${C.orange}`,color:C.orange,borderRadius:4,padding:"4px 12px",cursor:"pointer",fontSize:11,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>✏️ Edit</button>
+                            <button onClick={()=>setEditingBracket(b.id||i)} style={{background:"transparent",border:`1px solid ${C.orange}`,color:C.orange,borderRadius:4,padding:"4px 12px",cursor:"pointer",fontSize:23,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,letterSpacing:1}}>✏️ Edit</button>
                             <button onClick={()=>handleDeleteBracket(b.id||i)} style={{...deleteBtn,padding:"4px 10px",fontSize:12}}>Delete</button>
                           </div>
                         </div>
                       ))}
-                      <div style={{marginTop:16,padding:"12px 16px",background:"rgba(45,106,45,0.08)",border:`1px solid rgba(45,106,45,0.2)`,borderRadius:6,fontSize:12,color:C.textSecondary,fontFamily:"'Barlow', sans-serif",lineHeight:1.6}}>
+                      <div style={{marginTop:16,padding:"12px 16px",background:"rgba(45,106,45,0.08)",border:`1px solid rgba(45,106,45,0.2)`,borderRadius:6,fontSize:21,color:C.textSecondary,fontFamily:"'Barlow', sans-serif",lineHeight:1.6}}>
                         <strong style={{color:C.greenText,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>ALL 8 BRACKETS PRE-LOADED</strong> from your district PDFs. Click ✏️ Edit on any bracket to assign actual team names to the seeded slots, adjust matchups, or enter scores as games are played.
                       </div>
                     </div>
@@ -938,7 +938,7 @@ export default function App(){
         {/* FOOTER */}
         <div style={{background:C.darker,borderTop:`3px solid ${C.orange}`,padding:"18px 24px",textAlign:"center",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,transparent,rgba(232,93,4,0.04),transparent)"}}/>
-          <div style={{fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,fontSize:11,letterSpacing:4,color:C.textMuted,textTransform:"uppercase",position:"relative"}}>
+          <div style={{fontFamily:"'Barlow Condensed', sans-serif",fontWeight:600,fontSize:23,letterSpacing:4,color:C.textMuted,textTransform:"uppercase",position:"relative"}}>
             South Durham Little League · NC District 6 · 2026 All Stars
           </div>
         </div>
@@ -947,7 +947,7 @@ export default function App(){
   );
 }
 
-const inputStyle={width:"100%",padding:"10px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.1)",background:"#1a1a1a",color:"#fff",fontSize:14,boxSizing:"border-box",fontFamily:"'Barlow', sans-serif",outline:"none"};
-const primaryBtn={width:"100%",background:`linear-gradient(135deg,#2D6A2D,#1e4d1e)`,border:`2px solid #E85D04`,color:"#fff",padding:"13px",borderRadius:6,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:2,textTransform:"uppercase"};
-const headerBtn={background:"transparent",border:"1px solid rgba(255,255,255,0.2)",color:"rgba(255,255,255,0.6)",padding:"6px 14px",borderRadius:4,cursor:"pointer",fontSize:10,letterSpacing:2,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,textTransform:"uppercase"};
-const deleteBtn={background:"transparent",border:"1px solid rgba(255,255,255,0.1)",color:"#ff8c4a",borderRadius:4,padding:"2px 8px",cursor:"pointer",fontSize:11,fontFamily:"'Barlow', sans-serif"};
+const inputStyle={width:"100%",padding:"10px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.1)",background:"#1a1a1a",color:"#fff",fontSize:23,boxSizing:"border-box",fontFamily:"'Barlow', sans-serif",outline:"none"};
+const primaryBtn={width:"100%",background:`linear-gradient(135deg,#2D6A2D,#1e4d1e)`,border:`2px solid #E85D04`,color:"#fff",padding:"13px",borderRadius:6,fontSize:21,fontWeight:700,cursor:"pointer",fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:2,textTransform:"uppercase"};
+const headerBtn={background:"transparent",border:"1px solid rgba(255,255,255,0.2)",color:"rgba(255,255,255,0.6)",padding:"6px 14px",borderRadius:4,cursor:"pointer",fontSize:19,letterSpacing:2,fontFamily:"'Barlow Condensed', sans-serif",fontWeight:700,textTransform:"uppercase"};
+const deleteBtn={background:"transparent",border:"1px solid rgba(255,255,255,0.1)",color:"#ff8c4a",borderRadius:4,padding:"2px 8px",cursor:"pointer",fontSize:23,fontFamily:"'Barlow', sans-serif"};
