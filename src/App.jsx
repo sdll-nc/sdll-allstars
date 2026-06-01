@@ -795,6 +795,8 @@ export default function App(){
                   <div style={{color:C.textMuted,fontSize:21,marginTop:3}}>Manage results, schedules & brackets</div>
                 </div>
                 <div style={{padding:24}}>
+                  <Label>Email</Label>
+                  <input type="email" placeholder="sdllboard@gmail.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()} style={{...inputStyle,marginBottom:12}}/>
                   <Label>Password</Label>
                   <input type="password" placeholder="Enter password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()} style={{...inputStyle,borderColor:authError?C.orange:"rgba(255,255,255,0.1)",marginBottom:authError?6:16}}/>
                   {authError&&<div style={{color:C.orange,fontSize:21,marginBottom:14,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:1}}>Incorrect password.</div>}
