@@ -521,23 +521,33 @@ function BracketGameCard({game, gameNum, roundIndex, gameIndex, allRounds, onUpd
 
 // Visual bracket with SVG connector lines
 function BracketSection({rounds, allRounds, gameIndex, onUpdateGame, isAdmin, accentColor}) {
-  const CARD_H = 120; // approx card height px
-  const CARD_W = 200;
-  const COL_GAP = 40;
+  // CARD_H: game-number header(26) + team row(38) + divider(1) + team row(38) + date row(25) = ~128px
+  const CARD_H = 128;
+  const CARD_GAP = 16;
+  const CARD_W = 210;
+  const COL_GAP = 44;
+  // HEADER_H: round label(32) + marginBottom(12) = 44
+  const HEADER_H = 44;
   const isChampRound = r => r.bracket==="C" || r.name.toLowerCase().includes("championship");
+
+  // y-center of each card in a column (relative to top of column including header)
+  function cardCenters(n) {
+    return Array.from({length: n}, (_, gi) => HEADER_H + gi * (CARD_H + CARD_GAP) + CARD_H / 2);
+  }
+
+  function colHeight(n) {
+    return HEADER_H + n * CARD_H + Math.max(0, n - 1) * CARD_GAP;
+  }
 
   return (
     <div style={{overflowX:"auto", paddingBottom:8}}>
       <div style={{display:"flex", alignItems:"flex-start", gap:0, minWidth: rounds.length * (CARD_W + COL_GAP)}}>
         {rounds.map((round, ri) => {
           const globalRi = allRounds.indexOf(round);
-          const gamesInRound = round.games.length;
           const isChamp = isChampRound(round);
-          // Vertical spacing: distribute games evenly
-          const spacing = Math.max(CARD_H + 16, (gamesInRound > 1 ? 200 : CARD_H + 16));
 
           return (
-            <div key={ri} style={{display:"flex", alignItems:"stretch", flexShrink:0}}>
+            <div key={ri} style={{display:"flex", alignItems:"flex-start", flexShrink:0}}>
               {/* Column */}
               <div style={{width: CARD_W}}>
                 {/* Round header */}
@@ -551,7 +561,7 @@ function BracketSection({rounds, allRounds, gameIndex, onUpdateGame, isAdmin, ac
                 }}>{round.name}</div>
 
                 {/* Games */}
-                <div style={{display:"flex", flexDirection:"column", gap:16}}>
+                <div style={{display:"flex", flexDirection:"column", gap:CARD_GAP}}>
                   {round.games.map((game, gi) => (
                     <BracketGameCard
                       key={gi}
@@ -571,38 +581,30 @@ function BracketSection({rounds, allRounds, gameIndex, onUpdateGame, isAdmin, ac
               {/* SVG connector lines between rounds */}
               {ri < rounds.length - 1 && (() => {
                 const nextRound = rounds[ri + 1];
-                const currGames = round.games.length;
-                const nextGames = nextRound.games.length;
-                const svgH = Math.max(currGames, nextGames) * (CARD_H + 16) + 60;
+                const currN = round.games.length;
+                const nextN = nextRound.games.length;
+                const svgH = Math.max(colHeight(currN), colHeight(nextN)) + 20;
 
-                // Calculate y centers for current and next round cards
-                const currYs = round.games.map((_, gi) => {
-                  const totalH = currGames * CARD_H + (currGames - 1) * 16;
-                  const startY = (svgH - totalH) / 2;
-                  return startY + gi * (CARD_H + 16) + CARD_H / 2 + 36; // +36 for header
-                });
-                const nextYs = nextRound.games.map((_, gi) => {
-                  const totalH = nextGames * CARD_H + (nextGames - 1) * 16;
-                  const startY = (svgH - totalH) / 2;
-                  return startY + gi * (CARD_H + 16) + CARD_H / 2 + 36;
-                });
+                const currYs = cardCenters(currN);
+                const nextYs = cardCenters(nextN);
 
-                // Pair up: every 2 current games connect to 1 next game
                 const lines = [];
                 currYs.forEach((cy, i) => {
-                  const targetIdx = Math.floor(i / 2);
-                  const ny = nextYs[targetIdx] || nextYs[0];
+                  // When reducing rounds (e.g. 4->2), pair consecutive games
+                  const ratio = currN / Math.max(nextN, 1);
+                  const targetIdx = Math.min(Math.floor(i / ratio), nextN - 1);
+                  const ny = nextYs[targetIdx] !== undefined ? nextYs[targetIdx] : nextYs[nextYs.length - 1];
                   const mx = COL_GAP / 2;
                   lines.push(
                     <path key={i}
                       d={`M 0 ${cy} H ${mx} V ${ny} H ${COL_GAP}`}
-                      stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" fill="none"
+                      stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" fill="none" strokeLinejoin="round"
                     />
                   );
                 });
 
                 return (
-                  <svg width={COL_GAP} height={svgH} style={{flexShrink:0, marginTop:36}}>
+                  <svg width={COL_GAP} height={svgH} style={{flexShrink:0, overflow:"visible"}}>
                     {lines}
                   </svg>
                 );
@@ -1007,10 +1009,10 @@ export default function App(){
                             <div>
                               <div style={{padding:"8px 16px 6px 48px",background:"rgba(255,180,0,0.05)",borderBottom:"1px solid rgba(255,180,0,0.1)"}}><span style={{fontSize:19,fontWeight:700,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",fontFamily:"'Barlow Condensed', sans-serif"}}>📅 Upcoming</span></div>
                               {upcoming.map(g=>(
-                                <div key={g.id} style={{display:"flex",alignItems:"center",padding:"9px 16px 9px 48px",borderBottom:`1px solid ${C.border}`,background:"rgba(255,180,0,0.02)",fontSize:12}}>
-                                  <span style={{width:130,color:"#f59e0b",fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5}}>{formatDateTime(g.date,g.time)}</span>
-                                  <span style={{flex:1,color:C.textPrimary}}>vs. {g.opponent}</span>
-                                  {g.location&&<span style={{color:C.textMuted,fontSize:11}}>📍 {g.location}</span>}
+                                <div key={g.id} style={{display:"flex",alignItems:"center",padding:"11px 16px 11px 48px",borderBottom:`1px solid ${C.border}`,background:"rgba(255,180,0,0.02)",fontSize:15}}>
+                                  <span style={{width:150,color:"#f59e0b",fontWeight:700,fontFamily:"'Barlow Condensed', sans-serif",letterSpacing:0.5,flexShrink:0}}>{formatDateTime(g.date,g.time)}</span>
+                                  <span style={{flex:1,color:C.textPrimary,fontSize:15}}>vs. {g.opponent}</span>
+                                  {g.location&&<span style={{color:C.textMuted,fontSize:13}}>📍 {g.location}</span>}
                                 </div>
                               ))}
                             </div>
